@@ -19,23 +19,23 @@ public class Greeter extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        LocalTime start = (LocalTime) session.getAttribute("start");
+        HttpSession session = request.getSession(); // quando tomcat vede una request, guarda il cookie e se l'utente aveva già fatto una request precedente associa la session precedente e la riapre
+        LocalTime start = (LocalTime) session.getAttribute("start"); // gli attributi possono essere anche all'interno della session, rimane dentro finchè la session rimane attiva. Se non esisteva una session precedente, in start c'è null.
 
         Duration duration;
-        if (start == null) {
-            duration = Duration.ZERO;
-            session.setAttribute("start", LocalTime.now());
+        if (start == null) { // se non esiste una sessione precedente 
+            duration = Duration.ZERO; // metti 0 in duration della sessione
+            session.setAttribute("start", LocalTime.now()); // quindi metti l'ora corrente in session
         } else {
-            duration = Duration.between(start, LocalTime.now());
+            duration = Duration.between(start, LocalTime.now()); // altrimenti dico che duration è la distanza nel tempo tra start e now
         }
 
-        if (request.getParameter("done") == null) {
-            request.setAttribute("duration", duration);
+        if (request.getParameter("done") == null) { // cerco tra i parametri passati dall'utente "done", tipo logout
+            request.setAttribute("duration", duration); 
             RequestDispatcher rd = request.getRequestDispatcher("/s09/greeter.jsp");
             rd.forward(request, response);
         } else {
-            session.invalidate();
+            session.invalidate(); // sto terminando la sessione
 
             response.setContentType("text/html");
             response.setCharacterEncoding("utf-8");
